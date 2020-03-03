@@ -1,0 +1,25 @@
+---
+
+- assert:
+    that:
+      - user != ''
+
+- block:
+    - getent:
+        database: passwd
+        key: "{{ user }}"
+        split: ":"
+
+    - set_fact:
+        homedir: "{{ getent_passwd[user][4] }}"
+        
+    - template:
+        src: forward.j2
+        dest: "{{ homedir }}/.forward"
+        mode: 0600
+        owner: "{{ user }}"
+        group: "{{ user }}"
+  when:
+    forward_to | length > 0     
+    
+    
